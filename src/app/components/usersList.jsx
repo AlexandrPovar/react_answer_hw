@@ -7,7 +7,8 @@ import GroupList from "./groupList";
 import SearchStatus from "./searchStatus";
 import UserTable from "./usersTable";
 import _ from "lodash";
-const Users = () => {
+
+const UsersList = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [professions, setProfession] = useState();
     const [selectedProf, setSelectedProf] = useState();
@@ -15,9 +16,11 @@ const Users = () => {
     const pageSize = 8;
 
     const [users, setUsers] = useState();
+
     useEffect(() => {
         api.users.fetchAll().then((data) => setUsers(data));
     }, []);
+
     const handleDelete = (userId) => {
         setUsers(users.filter((user) => user._id !== userId));
     };
@@ -35,6 +38,7 @@ const Users = () => {
     useEffect(() => {
         api.professions.fetchAll().then((data) => setProfession(data));
     }, []);
+
     useEffect(() => {
         setCurrentPage(1);
     }, [selectedProf]);
@@ -96,7 +100,7 @@ const Users = () => {
                             onSort={handleSort}
                             selectedSort={sortBy}
                             onDelete={handleDelete}
-                            onTogleBookmark={handleToggleBookMark}
+                            onToggleBookMark={handleToggleBookMark}
                         />
                     )}
                     <div className="d-flex justify-content-center">
@@ -113,8 +117,8 @@ const Users = () => {
     }
     return "loading...";
 };
-Users.propTypes = {
+UsersList.propTypes = {
     users: PropTypes.array
 };
 
-export default Users;
+export default UsersList;
