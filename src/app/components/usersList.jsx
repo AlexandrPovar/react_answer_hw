@@ -7,7 +7,6 @@ import GroupList from "./groupList";
 import SearchStatus from "./searchStatus";
 import UserTable from "./usersTable";
 import _ from "lodash";
-
 const UsersList = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [professions, setProfession] = useState();
@@ -17,14 +16,18 @@ const UsersList = () => {
 
     const [users, setUsers] = useState();
 
+    const [searchInput, setSearchInput] = useState("");
+
+    const handleChange = (e) => {
+        setSearchInput(e.target.value);
+    };
+
     useEffect(() => {
         api.users.fetchAll().then((data) => setUsers(data));
     }, []);
-
     const handleDelete = (userId) => {
         setUsers(users.filter((user) => user._id !== userId));
     };
-
     const handleToggleBookMark = (id) => {
         const newArray = users.map((user) => {
             if (user._id === id) {
@@ -34,20 +37,20 @@ const UsersList = () => {
         });
         setUsers(newArray);
     };
-
     useEffect(() => {
         api.professions.fetchAll().then((data) => setProfession(data));
     }, []);
-
     useEffect(() => {
         setCurrentPage(1);
     }, [selectedProf]);
 
     const handleProfessionSelect = (item) => {
+        setSearchInput("");
         setSelectedProf(item);
     };
 
     const handlePageChange = (pageIndex) => {
+        setSearchInput("");
         setCurrentPage(pageIndex);
     };
     const handleSort = (item) => {
@@ -56,11 +59,28 @@ const UsersList = () => {
 
     if (users) {
         const filteredUsers = selectedProf
-            ? users.filter(
-                  (user) =>
-                      JSON.stringify(user.profession) ===
-                      JSON.stringify(selectedProf)
-              )
+            ? searchInput
+                ? users.filter((user) => {
+                      return (
+                          JSON.stringify(user.profession) ===
+                              JSON.stringify(selectedProf) &&
+                          user.name
+                              .toLowerCase()
+                              .includes(searchInput.toLocaleLowerCase())
+                      );
+                  })
+                : users.filter((user) => {
+                      return (
+                          JSON.stringify(user.profession) ===
+                          JSON.stringify(selectedProf)
+                      );
+                  })
+            : searchInput
+            ? users.filter((user) => {
+                  return user.name
+                      .toLowerCase()
+                      .includes(searchInput.toLowerCase());
+              })
             : users;
 
         const count = filteredUsers.length;
@@ -71,6 +91,7 @@ const UsersList = () => {
         );
         const usersCrop = paginate(sortedUsers, currentPage, pageSize);
         const clearFilter = () => {
+            setSearchInput("");
             setSelectedProf();
         };
 
@@ -94,6 +115,13 @@ const UsersList = () => {
                 )}
                 <div className="d-flex flex-column">
                     <SearchStatus length={count} />
+                    <input
+                        type="text"
+                        id="search"
+                        value={searchInput}
+                        onChange={handleChange}
+                        placeholder="Search..."
+                    />
                     {count > 0 && (
                         <UserTable
                             users={usersCrop}
@@ -120,5 +148,4 @@ const UsersList = () => {
 UsersList.propTypes = {
     users: PropTypes.array
 };
-
 export default UsersList;
