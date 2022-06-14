@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { useHistory } from "react-router-dom";
-import API from "../api";
-import QualitiesList from "./qualitiesList";
+import api from "../../../api";
+import Qualities from "../../ui/qualities";
 
 const UserPage = ({ userId }) => {
     const [user, setUser] = useState();
     useEffect(() => {
-        API.users.getById(userId).then((data) => setUser(data));
-    });
+        api.users.getById(userId).then((data) => setUser(data));
+    }, []);
     const history = useHistory();
     console.log(history);
 
@@ -21,7 +21,7 @@ const UserPage = ({ userId }) => {
             <div>
                 <h1>{user.name}</h1>
                 <h2>{`Профессия: ${user.profession.name}`}</h2>
-                <QualitiesList qualities={user.qualities} />
+                <Qualities qualities={user.qualities} />
                 <p>{`completedMeetings: ${user.completedMeetings}`}</p>
                 <h2>{`Rate: ${user.rate}`}</h2>
                 <button onClick={handleReturn}>Все пользователи</button>
