@@ -22,17 +22,17 @@ const MultiSelectField = ({ options, onChange, name, label, defaultValue }) => {
                 className="basic-multi-select"
                 classNamePrefix="select"
                 onChange={handleChange}
+                name={name}
             />
         </div>
     );
 };
-
 MultiSelectField.propTypes = {
     options: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
     onChange: PropTypes.func,
     name: PropTypes.string,
     label: PropTypes.string,
-    defaultValue: PropTypes.arr
+    defaultValue: PropTypes.array
 };
 
 export default MultiSelectField;

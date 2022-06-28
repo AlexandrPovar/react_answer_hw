@@ -43,4 +43,5 @@ RadioField.propTypes = {
     value: PropTypes.string,
     label: PropTypes.string
 };
+
 export default RadioField;

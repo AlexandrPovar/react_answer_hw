@@ -3,7 +3,6 @@ import PropTypes from "prop-types";
 import { paginate } from "../../../utils/paginate";
 import Pagination from "../../common/pagination";
 import api from "../../../api";
-
 import GroupList from "../../common/groupList";
 import SearchStatus from "../../ui/searchStatus";
 import UserTable from "../../ui/usersTable";
@@ -11,18 +10,12 @@ import _ from "lodash";
 const UsersListPage = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [professions, setProfession] = useState();
+    const [searchQuery, setSearchQuery] = useState("");
     const [selectedProf, setSelectedProf] = useState();
     const [sortBy, setSortBy] = useState({ path: "name", order: "asc" });
     const pageSize = 8;
 
     const [users, setUsers] = useState();
-
-    const [searchInput, setSearchInput] = useState("");
-
-    const handleChange = (e) => {
-        setSearchInput(e.target.value);
-    };
-
     useEffect(() => {
         api.users.fetchAll().then((data) => setUsers(data));
     }, []);
@@ -38,20 +31,25 @@ const UsersListPage = () => {
         });
         setUsers(newArray);
     };
+
     useEffect(() => {
         api.professions.fetchAll().then((data) => setProfession(data));
     }, []);
+
     useEffect(() => {
         setCurrentPage(1);
-    }, [selectedProf]);
+    }, [selectedProf, searchQuery]);
 
     const handleProfessionSelect = (item) => {
-        setSearchInput("");
+        if (searchQuery !== "") setSearchQuery("");
         setSelectedProf(item);
+    };
+    const handleSearchQuery = ({ target }) => {
+        setSelectedProf(undefined);
+        setSearchQuery(target.value);
     };
 
     const handlePageChange = (pageIndex) => {
-        setSearchInput("");
         setCurrentPage(pageIndex);
     };
     const handleSort = (item) => {
@@ -59,29 +57,19 @@ const UsersListPage = () => {
     };
 
     if (users) {
-        const filteredUsers = selectedProf
-            ? searchInput
-                ? users.filter((user) => {
-                      return (
-                          JSON.stringify(user.profession) ===
-                              JSON.stringify(selectedProf) &&
-                          user.name
-                              .toLowerCase()
-                              .includes(searchInput.toLocaleLowerCase())
-                      );
-                  })
-                : users.filter((user) => {
-                      return (
-                          JSON.stringify(user.profession) ===
-                          JSON.stringify(selectedProf)
-                      );
-                  })
-            : searchInput
-            ? users.filter((user) => {
-                  return user.name
-                      .toLowerCase()
-                      .includes(searchInput.toLowerCase());
-              })
+        const filteredUsers = searchQuery
+            ? users.filter(
+                  (user) =>
+                      user.name
+                          .toLowerCase()
+                          .indexOf(searchQuery.toLowerCase()) !== -1
+              )
+            : selectedProf
+            ? users.filter(
+                  (user) =>
+                      JSON.stringify(user.profession) ===
+                      JSON.stringify(selectedProf)
+              )
             : users;
 
         const count = filteredUsers.length;
@@ -92,7 +80,6 @@ const UsersListPage = () => {
         );
         const usersCrop = paginate(sortedUsers, currentPage, pageSize);
         const clearFilter = () => {
-            setSearchInput("");
             setSelectedProf();
         };
 
@@ -118,10 +105,10 @@ const UsersListPage = () => {
                     <SearchStatus length={count} />
                     <input
                         type="text"
-                        id="search"
-                        value={searchInput}
-                        onChange={handleChange}
+                        name="searchQuery"
                         placeholder="Search..."
+                        onChange={handleSearchQuery}
+                        value={searchQuery}
                     />
                     {count > 0 && (
                         <UserTable
@@ -149,4 +136,5 @@ const UsersListPage = () => {
 UsersListPage.propTypes = {
     users: PropTypes.array
 };
+
 export default UsersListPage;

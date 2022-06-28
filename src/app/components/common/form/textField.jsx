@@ -8,22 +8,22 @@ const TextField = ({ label, type, name, value, onChange, error }) => {
         onChange({ name: target.name, value: target.value });
     };
     const getInputClasses = () => {
-        return "form-control " + (error ? "is-invalid" : "");
+        return "form-control" + (error ? " is-invalid" : "");
     };
     const toggleShowPassword = () => {
         setShowPassword((prevState) => !prevState);
     };
     return (
         <div className="mb-4">
-            <label htmlFor="email">{label}</label>
+            <label htmlFor={name}>{label}</label>
             <div className="input-group has-validation">
                 <input
-                    className={getInputClasses()}
                     type={showPassword ? "text" : type}
                     id={name}
                     name={name}
                     value={value}
                     onChange={handleChange}
+                    className={getInputClasses()}
                 />
                 {type === "password" && (
                     <button
